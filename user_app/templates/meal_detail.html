@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block extra_head %}
+<!-- Poppins Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * {
+    font-family: 'Poppins', sans-serif;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-900 min-h-screen">
+  <!-- Main Content Container -->
+  <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
+    <!-- Header Section -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-700">
+      <h1 class="text-3xl font-bold text-white">{{ meal.title }}</h1>
+      
+    </div>
+
+    <!-- Main Content Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
+      <!-- Left Column - Image & Nutrition Info -->
+      <div class="lg:col-span-1">
+        {% if meal.image %}
+        <img src="{{ meal.image.url }}" alt="{{ meal.title }}"
+             class="w-full h-64 object-cover rounded-lg shadow-md" />
+        {% else %}
+        <div class="w-full h-64 bg-gray-700 flex items-center justify-center rounded-lg shadow-md">
+          <span class="text-gray-400">No Image Available</span>
+        </div>
+        {% endif %}
+
+        <!-- Tags Section -->
+        <div class="flex flex-wrap gap-2 mt-4">
+          <span class="bg-blue-900/50 text-blue-300 px-3 py-1 rounded-full text-sm font-medium border border-blue-500/30">
+            HIGH PROTEIN
+          </span>
+          <span class="bg-green-900/50 text-green-300 px-3 py-1 rounded-full text-sm font-medium border border-green-500/30">
+            ENERGY BOOSTER
+          </span>
+          <span class="bg-yellow-900/50 text-yellow-300 px-3 py-1 rounded-full text-sm font-medium border border-yellow-500/30">
+            LOW CHOLESTEROL
+          </span>
+        </div>
+
+        <!-- Nutrition Info -->
+        <div class="mt-6">
+          <h3 class="text-lg font-semibold text-white mb-3">Nutrition information</h3>
+          <div class="grid grid-cols-3 gap-4 bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+            <div class="text-center">
+              <p class="text-gray-400 text-sm">PROTEIN</p>
+              <p class="font-bold text-primary">32g</p>
+            </div>
+            <div class="text-center">
+              <p class="text-gray-400 text-sm">FAT</p>
+              <p class="font-bold text-primary">14g</p>
+            </div>
+            <div class="text-center">
+              <p class="text-gray-400 text-sm">NET CARBS</p>
+              <p class="font-bold text-primary">54g</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Middle Column - Ingredients -->
+      <div class="lg:col-span-1">
+        <h2 class="text-xl font-semibold text-white mb-4">Ingredients</h2>
+        <ul class="space-y-6">
+          {% if meal.ingredients %}
+            {% for ingredient in meal.ingredients %}
+            <li class="border-b border-gray-600 pb-4">
+              <p class="font-medium text-white">{{ ingredient.name }}</p>
+              {% if ingredient.alternative %}
+              <p class="text-gray-400 text-sm">Alternative: {{ ingredient.alternative }}</p>
+              {% endif %}
+            </li>
+            {% endfor %}
+          {% else %}
+          <li class="text-gray-400">No ingredients available.</li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <!-- Right Column - Directions & Review Form -->
+      <div class="lg:col-span-1">
+        <h2 class="text-xl font-semibold text-white mb-4">Directions</h2>
+        <ol class="space-y-6 list-decimal pl-5">
+          {% if meal.directions %}
+            {% for direction in meal.directions %}
+            <li class="pb-4">
+              <p class="text-gray-300">{{ direction.instruction }}</p>
+            </li>
+            {% endfor %}
+          {% else %}
+          <li class="text-gray-400">No directions provided.</li>
+          {% endif %}
+        </ol>
+
+        <!-- Review Form Section -->
+        <div class="mt-6 bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+          <h3 class="text-lg font-semibold text-white mb-3">Leave a Review</h3>
+          {% if review_form %}
+            {% if existing_review %}
+            <p class="text-sm text-gray-400 mb-3">
+              You have already submitted a review below. You can update it or delete and add a new review.
+            </p>
+            <form method="post" action="{% url 'delete_meal_review' meal.id %}" class="mb-4">
+              {% csrf_token %}
+              <button type="submit" class="bg-red-600 hover:bg-red-700 text-white w-full py-2 rounded-lg text-sm transition-colors">
+                Delete Your Review
+              </button>
+            </form>
+            {% endif %}
+            <form method="post" action="{% url 'meal_detail' meal.id %}">
+              {% csrf_token %}
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-300 mb-1">Rating</label>
+                  <select name="rating" class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-sm text-white focus:ring-2 focus:ring-primary focus:border-primary">
+                    <option value="5" {% if existing_review and existing_review.rating|default:"" == 5 %}selected{% endif %}>5 Stars</option>
+                    <option value="4" {% if existing_review and existing_review.rating|default:"" == 4 %}selected{% endif %}>4 Stars</option>
+                    <option value="3" {% if existing_review and existing_review.rating|default:"" == 3 %}selected{% endif %}>3 Stars</option>
+                    <option value="2" {% if existing_review and existing_review.rating|default:"" == 2 %}selected{% endif %}>2 Stars</option>
+                    <option value="1" {% if existing_review and existing_review.rating|default:"" == 1 %}selected{% endif %}>1 Star</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="review" class="block text-sm font-medium text-gray-300 mb-1">Review</label>
+                  <textarea name="review" rows="3" class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-sm text-white focus:ring-2 focus:ring-primary focus:border-primary" placeholder="Share your thoughts about this meal...">{% if existing_review %}{{ existing_review.review }}{% endif %}</textarea>
+                </div>
+                <button type="submit" class="btn-primary w-full py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors">Submit Review</button>
+              </div>
+            </form>
+          {% else %}
+            <p class="text-sm text-gray-400">
+              Please <a href="{% url 'login' %}" class="text-primary underline hover:text-primary/80">log in</a> to leave a review.
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="border-t border-gray-700 p-6">
+      <h3 class="text-xl font-semibold mb-4 text-white">Reviews ({{ meal.reviews.count }})</h3>
+      {% if meal.reviews.all %}
+      <div class="space-y-4">
+        {% for review in meal.reviews.all %}
+        <div class="border-b border-gray-600 pb-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-medium text-white">{{ review.user.email }}</div>
+            <div class="flex items-center">
+              {% for i in "12345"|make_list %}
+              <div>
+                {% if forloop.counter <= review.rating %}
+                <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                {% else %}
+                <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% if review.review %}
+          <p class="text-gray-300">{{ review.review }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-gray-400">No reviews yet. Be the first to review!</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-10">
+  <h1 class="text-3xl font-bold text-white mb-2">💬 AI Coach</h1>
+  <p class="text-gray-400 mb-6">Your personal trainer — powered by a local AI that knows
+    the app's workouts, meals, and your progress. Free &amp; private.</p>
+
+  <div class="bg-gray-800/60 rounded-2xl p-5">
+    <div id="chat-box" class="h-[420px] overflow-y-auto flex flex-col gap-3 p-4
+         bg-gray-900/60 rounded-xl mb-4"></div>
+
+    <div class="flex flex-wrap gap-2 mb-3">
+      <button onclick="quick('What workout should I do today?')"
+        class="text-xs px-3 py-1.5 rounded-full bg-gray-700/60 text-gray-300 hover:bg-emerald-600/30 hover:text-emerald-300 transition">🏋️ What should I do today?</button>
+      <button onclick="quick('How is my progress looking?')"
+        class="text-xs px-3 py-1.5 rounded-full bg-gray-700/60 text-gray-300 hover:bg-emerald-600/30 hover:text-emerald-300 transition">📈 My progress</button>
+      <button onclick="quick('Suggest a meal plan for my goal')"
+        class="text-xs px-3 py-1.5 rounded-full bg-gray-700/60 text-gray-300 hover:bg-emerald-600/30 hover:text-emerald-300 transition">🍽 Meal for my goal</button>
+      <button onclick="quick('Create a personalized workout plan for me based on my profile and save it')"
+        class="text-xs px-3 py-1.5 rounded-full bg-gray-700/60 text-gray-300 hover:bg-emerald-600/30 hover:text-emerald-300 transition">✨ Create my plan</button>
+      <a href="{% url 'my_plans' %}"
+        class="text-xs px-3 py-1.5 rounded-full bg-gray-700/60 text-gray-300 hover:bg-emerald-600/30 hover:text-emerald-300 transition">📋 My Plans</a>
+    </div>
+
+    <div class="flex gap-2">
+      <input id="chat-msg" type="text" placeholder="Ask about workouts, form, meals, recovery..."
+        class="flex-1 bg-gray-700/60 border border-gray-600 rounded-xl px-4 py-3 text-white
+               placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        onkeydown="if(event.key==='Enter')send()">
+      <button id="send-btn" onclick="send()"
+        class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold
+               px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let history = [];
+const box = document.getElementById("chat-box");
+
+function esc(s){const d=document.createElement("div");d.textContent=s??"";return d.innerHTML}
+function md(t){
+  t = t.replace(/^(\s*\d+[.)] .*)\n\s*\n(?=\s*\d+[.)] )/gm,"$1\n")
+       .replace(/^(\s*[-*•] .*)\n\s*\n(?=\s*[-*•] )/gm,"$1\n");
+  let h = esc(t);
+  h = h.replace(/^### (.*)$/gm,"<b class='block mt-2'>$1</b>")
+       .replace(/^## (.*)$/gm,"<b class='block mt-2'>$1</b>")
+       .replace(/\*\*(.*?)\*\*/g,"<b>$1</b>");
+  h = h.replace(/((?:^[-*•] .*$\n?)+)/gm, b=>"<ul class='list-disc ml-5'>"+
+        b.trim().split("\n").map(l=>`<li>${l.replace(/^[-*•] /,"")}</li>`).join("")+"</ul>");
+  h = h.replace(/((?:^\d+[.)] .*$\n?)+)/gm, b=>"<ol class='list-decimal ml-5'>"+
+        b.trim().split("\n").map(l=>`<li>${l.replace(/^\d+[.)] /,"")}</li>`).join("")+"</ol>");
+  return h.replace(/\n/g,"<br>");
+}
+
+function addMsg(text, who, tools, plans){
+  const div = document.createElement("div");
+  div.className = who==="user"
+    ? "self-end max-w-[80%] bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-2xl rounded-br-sm px-4 py-2.5 text-sm"
+    : "self-start max-w-[85%] bg-gray-800 text-gray-200 rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm leading-relaxed";
+  if(who==="bot") div.innerHTML = md(text); else div.textContent = text;
+  (plans||[]).forEach(p=>{
+    const a=document.createElement("a");
+    a.href="/my-plans/"+p.id+"/";
+    a.className="inline-flex items-center gap-2 mt-2 px-4 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500 text-emerald-300 text-sm font-semibold hover:bg-emerald-500 hover:text-white transition";
+    a.textContent="📋 View plan: "+p.title;
+    div.appendChild(document.createElement("br")); div.appendChild(a);
+  });
+  if(tools && tools.length){
+    const s=document.createElement("div");
+    s.className="text-[11px] text-gray-500 mt-1.5";
+    s.textContent="🔧 "+[...new Set(tools)].join(", ");
+    div.appendChild(s);
+  }
+  box.appendChild(div); box.scrollTop = box.scrollHeight;
+}
+
+function typing(on){
+  let t=document.getElementById("typing");
+  if(on&&!t){t=document.createElement("div");t.id="typing";
+    t.className="self-start text-gray-500 text-sm px-3 animate-pulse";
+    t.textContent="Coach is thinking…";box.appendChild(t);box.scrollTop=1e9;}
+  else if(!on&&t) t.remove();
+}
+
+function getCookie(name){
+  const v = document.cookie.match('(^|;)\\s*'+name+'\\s*=\\s*([^;]+)');
+  return v ? v.pop() : '';
+}
+
+function quick(q){document.getElementById("chat-msg").value=q;send()}
+
+async function send(){
+  const input=document.getElementById("chat-msg"), btn=document.getElementById("send-btn");
+  const msg=input.value.trim(); if(!msg) return;
+  addMsg(msg,"user"); input.value=""; btn.disabled=true; typing(true);
+  try{
+    const r = await fetch("{% url 'coach_chat' %}", {
+      method:"POST",
+      headers:{"Content-Type":"application/json","X-CSRFToken":getCookie("csrftoken")},
+      body: JSON.stringify({message:msg, history})
+    });
+    const data = await r.json();
+    typing(false);
+    if(data.error){ addMsg("Error: "+data.error,"bot"); }
+    else{
+      addMsg(data.reply,"bot",data.tools_used,data.created_plans);
+      history.push({role:"user",content:msg},{role:"assistant",content:data.reply});
+      if(history.length>12) history=history.slice(-12);
+    }
+  }catch(e){ typing(false); addMsg("Network error: "+e.message,"bot"); }
+  btn.disabled=false;
+}
+
+addMsg("Hey {{ user.first_name|default:user.username }}! 💪 I'm your AI coach. I know the app's workout & meal plans and your training history.\n\n- Ask **what to train today**\n- Check **your progress**\n- Get **meal ideas for your goal**\n\nFirst reply can take a moment while the local model warms up.","bot");
+</script>
+{% endblock %}

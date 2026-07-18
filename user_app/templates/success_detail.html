@@ -1,0 +1,503 @@
+{% extends 'base.html' %} {% block extra_head %}
+<!-- Poppins Font -->
+<link
+  href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  * {
+    font-family: "Poppins", sans-serif;
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+</style>
+{% endblock %}
+<div>
+  {% block content %}
+  <div>
+    <div class="max-w-5xl mx-auto px-4 py-8 bg-gray-900 min-h-screen">
+      <!-- Back Navigation -->
+      <div class="mb-8">
+        <a
+          href="{% url 'success_stories' %}"
+          class="inline-flex items-center text-primary hover:text-primary/80 transition-colors duration-200"
+        >
+          <svg
+            class="h-5 w-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          Back to Success Stories
+        </a>
+      </div>
+
+      <!-- Story Header -->
+      <div
+        class="bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden mb-8"
+      >
+        <div class="relative">
+          <!-- Hero Image -->
+          <div class="relative h-96 overflow-hidden">
+            {% if story.image %}
+            <img
+              src="{{ story.image.url }}"
+              alt="{{ story.title }}"
+              class="w-full h-full object-cover"
+            />
+            {% else %}
+            <img
+              src="https://cdn.shopify.com/s/files/1/1283/2557/files/Body_Transformation_In_3_Months_by_Swolverine_1024x1024.png?v=1669226829"
+              alt="{{ story.title }}"
+              class="w-full h-full object-cover"
+            />
+            {% endif %}
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"
+            ></div>
+
+            <!-- Header Content Overlay -->
+            <div class="absolute bottom-0 left-0 right-0 p-8">
+              <div class="flex flex-wrap items-center gap-3 mb-4">
+                <span
+                  class="bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold"
+                >
+                  {{ story.get_category_display }}
+                </span>
+                {% if story.is_verified %}
+                <span
+                  class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center"
+                >
+                  <svg
+                    class="h-4 w-4 mr-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  Verified Story
+                </span>
+                {% endif %} {% if story.is_featured %}
+                <span
+                  class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-semibold"
+                >
+                  ⭐ Featured
+                </span>
+                {% endif %}
+              </div>
+              <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4">
+                {{ story.title|default:"Incredible Transformation" }}
+              </h1>
+              {% if story.user %}
+              <div class="flex items-center text-gray-300">
+                <div
+                  class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3"
+                >
+                  <svg
+                    class="h-5 w-5 text-primary"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-semibold text-white">
+                    {{ story.user.first_name|default:"Anonymous" }} {{
+                    story.user.last_name|default:"" }}
+                  </p>
+                  <p class="text-sm text-gray-400">
+                    {{ story.created_at|date:"F d, Y" }}
+                  </p>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transformation Overview -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <!-- Main Stats -->
+        <div class="lg:col-span-2">
+          <div
+            class="bg-gray-800 border border-gray-700 rounded-xl p-8 shadow-xl"
+          >
+            <h2 class="text-2xl font-bold text-white mb-6">
+              Transformation Overview
+            </h2>
+            <div class="prose prose-lg prose-invert max-w-none">
+              <p class="text-gray-300 leading-relaxed text-lg">
+                {% if story.description %} {{ story.description }} {% else %}
+                This is an inspiring transformation story showcasing dedication,
+                hard work, and perseverance in achieving remarkable fitness
+                results. {% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="space-y-6">
+          <!-- Duration Card -->
+          {% if story.duration %}
+          <div
+            class="bg-gray-800 border border-gray-700 rounded-xl p-6 text-center shadow-xl"
+          >
+            <div
+              class="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4 border border-primary/30"
+            >
+              <svg
+                class="h-8 w-8 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Duration</h3>
+            <p class="text-2xl font-bold text-primary">{{ story.duration }}</p>
+          </div>
+          {% endif %}
+
+          <!-- Weight Loss Card -->
+          {% if story.get_weight_loss_display %}
+          <div
+            class="bg-gray-800 border border-gray-700 rounded-xl p-6 text-center shadow-xl"
+          >
+            <div
+              class="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4 border border-primary/30"
+            >
+              <svg
+                class="h-8 w-8 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Result</h3>
+            <p class="text-2xl font-bold text-primary">
+              {{ story.get_weight_loss_display }}
+            </p>
+          </div>
+          {% endif %}
+
+          <!-- Achievement Card -->
+          {% if story.biggest_achievement %}
+          <div
+            class="bg-gray-800 border border-gray-700 rounded-xl p-6 text-center shadow-xl"
+          >
+            <div
+              class="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4 border border-primary/30"
+            >
+              <svg
+                class="h-8 w-8 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Achievement</h3>
+            <p class="text-gray-300 text-sm">{{ story.biggest_achievement }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Before/After Images -->
+      {% if story.before_image or story.after_image %}
+      <div
+        class="bg-gray-800 border border-gray-700 rounded-xl p-8 mb-8 shadow-xl"
+      >
+        <h2 class="text-2xl font-bold text-white mb-6 text-center">
+          Transformation Results
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {% if story.before_image %}
+          <div class="text-center">
+            <h3 class="text-lg font-semibold text-gray-300 mb-4">Before</h3>
+            <img
+              src="{{ story.before_image.url }}"
+              alt="Before transformation"
+              class="w-full h-80 object-cover rounded-lg shadow-lg"
+            />
+          </div>
+          {% endif %} {% if story.after_image %}
+          <div class="text-center">
+            <h3 class="text-lg font-semibold text-gray-300 mb-4">After</h3>
+            <img
+              src="{{ story.after_image.url }}"
+              alt="After transformation"
+              class="w-full h-80 object-cover rounded-lg shadow-lg"
+            />
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Detailed Information -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Motivation & Challenges -->
+        <div class="space-y-6">
+          {% if story.motivation %}
+          <div
+            class="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-xl"
+          >
+            <div class="flex items-center mb-4">
+              <svg
+                class="h-6 w-6 text-primary mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+              <h3 class="text-xl font-semibold text-white">
+                What Motivated This Journey
+              </h3>
+            </div>
+            <p class="text-gray-300 leading-relaxed">{{ story.motivation }}</p>
+          </div>
+          {% endif %} {% if story.key_challenges %}
+          <div
+            class="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-xl"
+          >
+            <div class="flex items-center mb-4">
+              <svg
+                class="h-6 w-6 text-primary mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+              <h3 class="text-xl font-semibold text-white">Key Challenges</h3>
+            </div>
+            <p class="text-gray-300 leading-relaxed">
+              {{ story.key_challenges }}
+            </p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Workout & Diet -->
+        <div class="space-y-6">
+          {% if story.workout_routine %}
+          <div
+            class="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-xl"
+          >
+            <div class="flex items-center mb-4">
+              <svg
+                class="h-6 w-6 text-primary mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
+              </svg>
+              <h3 class="text-xl font-semibold text-white">Workout Routine</h3>
+            </div>
+            <p class="text-gray-300 leading-relaxed">
+              {{ story.workout_routine }}
+            </p>
+          </div>
+          {% endif %} {% if story.diet_changes %}
+          <div
+            class="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-xl"
+          >
+            <div class="flex items-center mb-4">
+              <svg
+                class="h-6 w-6 text-primary mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <h3 class="text-xl font-semibold text-white">Diet Changes</h3>
+            </div>
+            <p class="text-gray-300 leading-relaxed">
+              {{ story.diet_changes }}
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Advice Section -->
+      {% if story.advice_for_others %}
+      <div
+        class="bg-gradient-to-r from-primary/20 to-blue-500/20 border border-primary/30 rounded-xl p-8 mb-8 shadow-xl"
+      >
+        <div class="text-center mb-6">
+          <svg
+            class="h-12 w-12 text-primary mx-auto mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <h2 class="text-2xl font-bold text-white">Advice for Others</h2>
+        </div>
+        <blockquote
+          class="text-lg text-gray-300 leading-relaxed text-center italic"
+        >
+          "{{ story.advice_for_others }}"
+        </blockquote>
+      </div>
+      {% endif %}
+
+      <!-- Related Stories -->
+      {% if related_stories %}
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-white mb-6">
+          More Inspiring Stories
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {% for related_story in related_stories %}
+          <div
+            class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:border-primary/50 group"
+          >
+            <div class="relative">
+              {% if related_story.image %}
+              <img
+                src="{{ related_story.image.url }}"
+                alt="{{ related_story.title }}"
+                class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              {% else %}
+              <img
+                src="https://cdn.shopify.com/s/files/1/1283/2557/files/Body_Transformation_In_3_Months_by_Swolverine_1024x1024.png?v=1669226829"
+                alt="{{ related_story.title }}"
+                class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              {% endif %}
+              <div class="absolute top-3 left-3">
+                <span
+                  class="bg-gray-900/80 text-primary px-2 py-1 rounded-full text-xs font-semibold backdrop-blur-sm"
+                >
+                  {{ related_story.get_category_display }}
+                </span>
+              </div>
+            </div>
+            <div class="p-4">
+              <h3
+                class="text-lg font-semibold text-white mb-2 group-hover:text-primary transition-colors duration-200"
+              >
+                {{ related_story.title|truncatewords:8 }}
+              </h3>
+              <p class="text-gray-400 text-sm mb-3">
+                {{ related_story.description|truncatewords:15 }}
+              </p>
+              <a
+                href="{% url 'success_detail' related_story.pk %}"
+                class="text-primary hover:text-primary/80 font-medium text-sm transition-colors duration-200"
+              >
+                Read Story →
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Call to Action -->
+      <div
+        class="text-center bg-gray-800 border border-gray-700 rounded-xl p-8 shadow-xl"
+      >
+        <h3 class="text-2xl font-bold text-white mb-4">
+          Inspired by This Story?
+        </h3>
+        <p class="text-gray-300 mb-6 max-w-2xl mx-auto">
+          Start your own transformation journey today. Every small step counts
+          towards achieving your fitness goals.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="{% url 'workouts_list' %}"
+            class="bg-primary hover:bg-primary/80 text-white px-6 py-3 rounded-lg font-semibold transition duration-200"
+          >
+            Start Your Workout Journey
+          </a>
+          <a
+            href="{% url 'meals_list' %}"
+            class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 border border-gray-600"
+          >
+            Explore Meal Plans
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% load static %}
+<div class="steps-editor-widget">
+  <input
+    type="hidden"
+    name="{{ widget.name }}"
+    id="id_{{ widget.name }}"
+    value="{{ widget.value|escapejs }}"
+  />
+  <button
+    type="button"
+    class="btn btn-secondary"
+    id="edit_steps_button_{{ widget.name }}"
+  >
+    Edit Steps
+  </button>
+
+  <!-- Modal container -->
+  <div
+    id="steps_modal_{{ widget.name }}"
+    class="steps-modal"
+    style="display: none"
+  >
+    <div class="steps-modal-content">
+      <h3>Edit Workout Steps</h3>
+      <div id="steps_list_{{ widget.name }}">
+        {% for step in widget.steps %}
+        <div class="step-item">
+          <label>Order:</label>
+          <input
+            type="number"
+            class="step-order"
+            value="{{ step.order }}"
+          /><br />
+          <label>Guide:</label>
+          <input
+            type="text"
+            class="step-guide"
+            value="{{ step.guide }}"
+          /><br />
+          <label>Duration:</label>
+          <input
+            type="number"
+            class="step-duration"
+            value="{{ step.duration }}"
+          /><br />
+          <label>Image URL:</label>
+          <input
+            type="text"
+            class="step-image"
+            value="{{ step.image }}"
+          /><br />
+          <label>YouTube Link:</label>
+          <input
+            type="text"
+            class="step-youtube"
+            value="{{ step.youtube_link }}"
+          /><br />
+          <button type="button" class="remove-step">Remove</button>
+          <hr />
+        </div>
+        {% endfor %}
+      </div>
+      <button type="button" id="add_step_{{ widget.name }}">Add Step</button>
+      <button type="button" id="save_steps_{{ widget.name }}">Save</button>
+      <button type="button" id="cancel_steps_{{ widget.name }}">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Inline CSS -->
+<style>
+  .steps-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .steps-modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    max-height: 80%;
+    overflow-y: auto;
+  }
+  .step-item {
+    margin-bottom: 10px;
+  }
+</style>
+
+<!-- Inline JavaScript -->
+<script>
+  (function ($) {
+    $(document).ready(function () {
+      var widgetName = "{{ widget.name }}";
+      $("#edit_steps_button_" + widgetName).on("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#steps_modal_" + widgetName).show();
+      });
+      $("#cancel_steps_" + widgetName).on("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#steps_modal_" + widgetName).hide();
+      });
+      $("#add_step_" + widgetName).on("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var stepHtml =
+          '<div class="step-item">' +
+          "<label>Order:</label>" +
+          '<input type="number" class="step-order" value="0" /><br />' +
+          "<label>Guide:</label>" +
+          '<input type="text" class="step-guide" value="" /><br />' +
+          "<label>Duration:</label>" +
+          '<input type="number" class="step-duration" value="0" /><br />' +
+          "<label>Image URL:</label>" +
+          '<input type="text" class="step-image" value="" /><br />' +
+          "<label>YouTube Link:</label>" +
+          '<input type="text" class="step-youtube" value="" /><br />' +
+          '<button type="button" class="remove-step">Remove</button>' +
+          "<hr /></div>";
+        $("#steps_list_" + widgetName).append(stepHtml);
+      });
+      $("#steps_list_" + widgetName).on("click", ".remove-step", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).closest(".step-item").remove();
+      });
+      $("#save_steps_" + widgetName).on("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var steps = [];
+        $("#steps_list_" + widgetName + " .step-item").each(function () {
+          var order = $(this).find(".step-order").val();
+          var guide = $(this).find(".step-guide").val();
+          var duration = $(this).find(".step-duration").val();
+          var image = $(this).find(".step-image").val();
+          var youtube_link = $(this).find(".step-youtube").val();
+          steps.push({
+            order: order,
+            guide: guide,
+            duration: duration,
+            image: image,
+            youtube_link: youtube_link,
+          });
+        });
+        $("#id_" + widgetName).val(JSON.stringify(steps));
+        $("#steps_modal_" + widgetName).hide();
+      });
+    });
+  })(django.jQuery);
+</script>

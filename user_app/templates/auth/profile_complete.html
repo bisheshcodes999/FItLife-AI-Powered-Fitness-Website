@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <!-- Poppins Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-gray-900 min-h-screen py-12">
+  <div class="max-w-5xl mx-auto">
+    <div class="bg-gray-800 shadow-2xl rounded-xl border border-gray-700 p-8 flex flex-col md:flex-row">
+      
+      <!-- Left Sidebar: Profile Preview & Navigation Hints -->
+      <div class="w-full md:w-1/3 border-r border-gray-600 pr-8 mb-6 md:mb-0">
+        <div class="flex flex-col items-center">
+          {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover mb-4 border-4 border-primary">
+          {% else %}
+            <div class="w-32 h-32 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center mb-4 border-4 border-gray-600">
+              <span class="text-3xl text-white">{{ user.first_name|first }}{{ user.last_name|first }}</span>
+            </div>
+          {% endif %}
+          <h2 class="text-xl font-heading font-bold text-white">{{ user.first_name }} {{ user.last_name }}</h2>
+          <p class="text-gray-400">{{ user.email }}</p>
+        </div>
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold text-white mb-4">Complete Your Profile</h3>
+          <ul class="space-y-4">
+            <li class="flex items-center">
+              <svg class="h-6 w-6 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M12 21a9 9 0 110-18 9 9 0 010 18z" />
+              </svg>
+              <span class="text-gray-300">Physical Details</span>
+            </li>
+            <li class="flex items-center">
+              <svg class="h-6 w-6 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-gray-300">Fitness Goals</span>
+            </li>
+            <li class="flex items-center">
+              <svg class="h-6 w-6 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span class="text-gray-300">Health & Safety</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Right Panel: Profile Completion Form -->
+      <div class="w-full md:w-2/3 pl-0 md:pl-8">
+        <h1 class="text-3xl font-heading mb-6 text-center md:text-left text-white">Complete Your Profile</h1>
+        
+        {% if messages %}
+          <div class="mb-4">
+            {% for message in messages %}
+              <div class="mb-2 p-3 border rounded {% if message.tags %}{{ message.tags }}{% endif %} bg-blue-900/30 border-blue-500/50 text-blue-200">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+          {% csrf_token %}
+          
+          <!-- Required Fields Notice -->
+          <div class="bg-orange-900/30 border border-orange-500/50 rounded-lg p-4 mb-6">
+            <div class="flex items-start">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p class="text-orange-300 font-semibold">Required for AI Recommendations</p>
+                <p class="text-orange-200 text-sm mt-1">
+                  Fields marked with <span class="text-red-400">*</span> are essential for generating personalized exercise and workout recommendations.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Physical Details -->
+          <div class="border border-gray-600 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Physical Details
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="height" class="block mb-2 font-semibold text-gray-300">Height (cm) <span class="text-red-400">*</span></label>
+                <input type="number" step="0.1" id="height" name="height"
+                       value="{{ user.height|default_if_none:'' }}"
+                       min="100" max="250"
+                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" 
+                       placeholder="Enter height in cm" />
+              </div>
+              <div>
+                <label for="weight" class="block mb-2 font-semibold text-gray-300">Weight (kg) <span class="text-red-400">*</span></label>
+                <input type="number" step="0.1" id="weight" name="weight"
+                       value="{{ user.weight|default_if_none:'' }}"
+                       min="30" max="300"
+                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" 
+                       placeholder="Enter weight in kg" />
+              </div>
+              <div>
+                <label for="age" class="block mb-2 font-semibold text-gray-300">Age <span class="text-red-400">*</span></label>
+                <input type="number" id="age" name="age"
+                       value="{{ user.age|default_if_none:'' }}"
+                       min="13" max="100"
+                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" 
+                       placeholder="Enter your age" />
+              </div>
+              <div>
+                <label for="gender" class="block mb-2 font-semibold text-gray-300">Gender</label>
+                <select id="gender" name="gender" 
+                        class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                  <option value="">Select Gender</option>
+                  <option value="Male" {% if user.gender == "Male" %}selected{% endif %}>Male</option>
+                  <option value="Female" {% if user.gender == "Female" %}selected{% endif %}>Female</option>
+                  <option value="Other" {% if user.gender == "Other" %}selected{% endif %}>Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        
+          <!-- Section: Profile Picture & Bio -->
+          <div class="bg-gray-800 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-white mb-4">Profile Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="profile_picture" class="block mb-2 font-semibold text-gray-300">Profile Picture</label>
+                <input type="file" id="profile_picture" name="profile_picture" 
+                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark" />
+              </div>
+              <div>
+                <label for="bio" class="block mb-2 font-semibold text-gray-300">Bio</label>
+                <textarea id="bio" name="bio" rows="4"
+                          class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                          placeholder="Tell us about yourself...">{{ user.bio|default_if_none:'' }}</textarea>
+              </div>
+            </div>
+          </div>
+        
+          <!-- Section: Fitness Goals & Experience -->
+          <div class="bg-gray-800 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-white mb-4">Fitness Goals & Experience <span class="text-red-400">*</span></h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="fitness_goal" class="block mb-2 font-semibold text-gray-300">Fitness Goal <span class="text-red-400">*</span></label>
+                <select id="fitness_goal" name="fitness_goal" required
+                        class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                  <option value="">Select Fitness Goal</option>
+                  <option value="weight_loss" {% if user.fitness_goal == "weight_loss" %}selected{% endif %}>Weight Loss</option>
+                  <option value="muscle_gain" {% if user.fitness_goal == "muscle_gain" %}selected{% endif %}>Muscle Gain</option>
+                  <option value="endurance" {% if user.fitness_goal == "endurance" %}selected{% endif %}>Endurance</option>
+                  <option value="flexibility" {% if user.fitness_goal == "flexibility" %}selected{% endif %}>Flexibility</option>
+                  <option value="general_health" {% if user.fitness_goal == "general_health" %}selected{% endif %}>General Health</option>
+                </select>
+              </div>
+              <div>
+                <label for="experience_level" class="block mb-2 font-semibold text-gray-300">Experience Level <span class="text-red-400">*</span></label>
+                <select id="experience_level" name="experience_level" required
+                        class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                  <option value="">Select Experience Level</option>
+                  <option value="beginner" {% if user.experience_level == "beginner" %}selected{% endif %}>Beginner</option>
+                  <option value="intermediate" {% if user.experience_level == "intermediate" %}selected{% endif %}>Intermediate</option>
+                  <option value="advanced" {% if user.experience_level == "advanced" %}selected{% endif %}>Advanced</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        
+          <!-- Section: Additional Information -->
+          <div class="bg-gray-800 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-white mb-4">Additional Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label for="workout_frequency" class="block mb-2 font-semibold text-gray-300">Workout Frequency (days/week)</label>
+                <input type="number" id="workout_frequency" name="workout_frequency"
+                       value="{{ user.workout_frequency|default_if_none:'' }}"
+                       min="0" max="7"
+                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                       placeholder="e.g., 3" />
+              </div>
+              <div>
+                <label for="diet_preference" class="block mb-2 font-semibold text-gray-300">Diet Preference</label>
+                <select id="diet_preference" name="diet_preference" 
+                        class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                  <option value="">Select Diet Preference</option>
+                  <option value="veg" {% if user.diet_preference == "veg" %}selected{% endif %}>Vegetarian</option>
+                  <option value="non_veg" {% if user.diet_preference == "non_veg" %}selected{% endif %}>Non-Vegetarian</option>
+                </select>
+              </div>
+              <div>
+                <label for="injuries" class="block mb-2 font-semibold text-gray-300">Injuries/Medical Conditions</label>
+                <textarea id="injuries" name="injuries" rows="2"
+                          class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                          placeholder="Any injuries or medical conditions...">{{ user.injuries|default_if_none:'' }}</textarea>
+              </div>
+            </div>
+          </div>
+        
+        <!-- Required Fields Notice -->
+        <div class="bg-orange-900/30 border border-orange-500 rounded-lg p-4 mb-6">
+          <div class="flex items-center">
+            <svg class="w-5 h-5 text-orange-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <p class="text-orange-200 text-sm">
+              <span class="font-semibold">Required fields</span> marked with <span class="text-red-400">*</span> are needed for AI exercise recommendations.
+            </p>
+          </div>
+        </div>
+
+        <div class="text-center mt-8">
+          <button type="submit"
+                  class="bg-primary hover:bg-primary-dark text-white font-semibold rounded-full px-8 py-3 transition duration-200 ease-in-out transform hover:scale-105 shadow-lg">
+            Complete Profile
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

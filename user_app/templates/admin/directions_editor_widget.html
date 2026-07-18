@@ -1,0 +1,135 @@
+{% load static %}
+<div class="directions-editor-widget">
+  <input
+    type="hidden"
+    name="{{ widget.name }}"
+    id="id_{{ widget.name }}"
+    value="{{ widget.value|escapejs }}"
+  />
+  <button
+    type="button"
+    class="btn btn-secondary"
+    id="edit_directions_button_{{ widget.name }}"
+  >
+    Edit Directions
+  </button>
+
+  <!-- Modal container -->
+  <div
+    id="directions_modal_{{ widget.name }}"
+    class="directions-modal"
+    style="display: none"
+  >
+    <div class="directions-modal-content">
+      <h3>Edit Meal Directions</h3>
+      <div id="directions_list_{{ widget.name }}">
+        {% for direction in widget.directions %}
+        <div class="direction-item">
+          <label>Step:</label>
+          <input
+            type="number"
+            class="direction-step"
+            value="{{ direction.step }}"
+          /><br />
+          <label>Instruction:</label>
+          <input
+            type="text"
+            class="direction-instruction"
+            value="{{ direction.instruction }}"
+          /><br />
+          <button type="button" class="remove-direction">Remove</button>
+          <hr />
+        </div>
+        {% endfor %}
+      </div>
+      <button type="button" id="add_direction_{{ widget.name }}">
+        Add Direction
+      </button>
+      <button type="button" id="save_directions_{{ widget.name }}">Save</button>
+      <button type="button" id="cancel_directions_{{ widget.name }}">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Inline CSS -->
+<style>
+  .directions-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .directions-modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    max-height: 80%;
+    overflow-y: auto;
+  }
+  .direction-item {
+    margin-bottom: 10px;
+  }
+</style>
+
+<!-- Inline JavaScript -->
+<script>
+  (function ($) {
+    $(document).ready(function () {
+      var widgetName = "{{ widget.name }}";
+      $("#edit_directions_button_" + widgetName).on("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#directions_modal_" + widgetName).show();
+      });
+      $("#cancel_directions_" + widgetName).on("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#directions_modal_" + widgetName).hide();
+      });
+      $("#add_direction_" + widgetName).on("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var directionHtml =
+          '<div class="direction-item">' +
+          "<label>Step:</label>" +
+          '<input type="number" class="direction-step" value="0" /><br />' +
+          "<label>Instruction:</label>" +
+          '<input type="text" class="direction-instruction" value="" /><br />' +
+          '<button type="button" class="remove-direction">Remove</button>' +
+          "<hr /></div>";
+        $("#directions_list_" + widgetName).append(directionHtml);
+      });
+      $("#directions_list_" + widgetName).on(
+        "click",
+        ".remove-direction",
+        function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          $(this).closest(".direction-item").remove();
+        }
+      );
+      $("#save_directions_" + widgetName).on("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var directions = [];
+        $("#directions_list_" + widgetName + " .direction-item").each(
+          function () {
+            var step = $(this).find(".direction-step").val();
+            var instruction = $(this).find(".direction-instruction").val();
+            directions.push({ step: step, instruction: instruction });
+          }
+        );
+        $("#id_" + widgetName).val(JSON.stringify(directions));
+        $("#directions_modal_" + widgetName).hide();
+      });
+    });
+  })(django.jQuery);
+</script>

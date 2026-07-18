@@ -1,0 +1,48 @@
+{% extends "base.html" %} {% block title %}Purchase Subscription{% endblock %}
+{% block extra_head %}
+<style>
+  /* Custom styles for the purchase page */
+  .purchase-container {
+    padding: 2rem;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="py-12 purchase-container">
+  <div class="container mx-auto max-w-xl px-4">
+    <div class="bg-white shadow-md rounded-lg p-8">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">
+        Purchase Subscription
+      </h2>
+      <p class="text-gray-700 mb-4">
+        You are about to purchase the <strong>{{ plan|title }}</strong> plan for
+        <strong>Rs.{{ price }}</strong> per month.
+      </p>
+      <!-- Transaction ID for reference (displayed for debugging; hide it in production) -->
+      <p class="text-sm text-gray-500 mb-4">
+        Transaction ID: {{ transaction_uuid }}
+      </p>
+
+      <!-- eSewa Payment Form -->
+      <form
+        action="https://rc-epay.esewa.com.np/api/epay/main/v2/form"
+        method="POST"
+      >
+        {{ esewa_form|safe }}
+        <button
+          type="submit"
+          class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+        >
+          Pay with eSewa
+        </button>
+      </form>
+
+      <a
+        href="{% url 'pricing' %}"
+        class="mt-4 inline-block text-blue-600 hover:underline"
+      >
+        Cancel and Return
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

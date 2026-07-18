@@ -1,0 +1,656 @@
+{% extends "base.html" %}
+{% load my_custom_filters %}
+{% block content %}
+<!-- Dark Hero Section -->
+<div class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-r from-blue-900/20 to-purple-900/20"></div>
+  <div class="absolute top-0 left-0 w-full h-full">
+    <div class="absolute top-10 left-10 w-20 h-20 bg-blue-500/10 rounded-full blur-xl"></div>
+    <div class="absolute top-32 right-20 w-32 h-32 bg-purple-500/10 rounded-full blur-xl"></div>
+    <div class="absolute bottom-20 left-1/3 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl"></div>
+  </div>
+  
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl md:text-5xl font-black text-white mb-4 font-heading">
+        Explore
+        <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Meal Plans</span>
+      </h1>
+      <p class="text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+        Discover delicious recipes and healthy meal plans
+      </p>
+    </div>
+    
+    <!-- Enhanced Dark Search Section -->
+    <div class="max-w-2xl mx-auto mb-6">
+      <form method="GET" action="{% url 'meals_list' %}" class="w-full">
+        <div class="relative group">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <input
+              type="text"
+              name="q"
+              value="{{ query }}"
+              placeholder="Search recipes, ingredients, cuisines..."
+              class="w-full pl-12 pr-12 py-4 border border-gray-700 rounded-2xl shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800/80 backdrop-blur-sm hover:bg-gray-800 transition-all duration-300 text-white placeholder-gray-400"
+            />
+            <button
+              type="submit"
+              class="absolute right-2 top-2 bottom-2 px-4 text-gray-400 hover:text-white hover:bg-blue-600 rounded-xl transition-all duration-300 flex items-center justify-center"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Dark Background Container -->
+<div class="bg-gray-900 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Compact Filter Section -->
+    <div class="mb-8">
+      <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6">
+        <div class="flex flex-wrap gap-3 items-center justify-center">
+          <span class="text-sm font-medium text-gray-300 mr-2">Filter by:</span>
+          <a
+            href="{% url 'meals_list' %}"
+            class="px-4 py-2 bg-gray-700 hover:bg-blue-600 rounded-xl text-sm font-medium text-gray-300 hover:text-white transition-all duration-300 {% if not query or query == "" %}bg-blue-600 text-white{% endif %}"
+          >
+            All Meals
+          </a>
+          
+          
+          <!-- Quick Search Tags -->
+          <div class="border-l border-gray-600 pl-4 ml-2">
+            <div class="flex flex-wrap gap-2">
+              <button onclick="document.querySelector('input[name=q]').value='breakfast'; document.querySelector('form').submit();" 
+                      class="px-3 py-1 bg-gray-600 hover:bg-orange-600 text-gray-300 hover:text-white rounded-lg text-xs transition-all duration-200">
+                Breakfast
+              </button>
+              <button onclick="document.querySelector('input[name=q]').value='lunch'; document.querySelector('form').submit();" 
+                      class="px-3 py-1 bg-gray-600 hover:bg-blue-600 text-gray-300 hover:text-white rounded-lg text-xs transition-all duration-200">
+                Lunch
+              </button>
+              <button onclick="document.querySelector('input[name=q]').value='dinner'; document.querySelector('form').submit();" 
+                      class="px-3 py-1 bg-gray-600 hover:bg-purple-600 text-gray-300 hover:text-white rounded-lg text-xs transition-all duration-200">
+                Dinner
+              </button>
+              <button onclick="document.querySelector('input[name=q]').value='healthy'; document.querySelector('form').submit();" 
+                      class="px-3 py-1 bg-gray-600 hover:bg-green-600 text-gray-300 hover:text-white rounded-lg text-xs transition-all duration-200">
+                Healthy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Recommendations Section -->
+    {% if user.is_authenticated %}
+    <div class="mb-8">
+      <div class="bg-gradient-to-r from-purple-900/30 to-blue-900/30 backdrop-blur-sm rounded-2xl border border-purple-500/30 p-6">
+        <div class="flex items-center mb-4">
+          <div class="flex items-center space-x-3">
+            <div class="p-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">🤖 AI Meal Assistant</h3>
+              <p class="text-sm text-gray-300">Ask AI for personalized meal recommendations</p>
+            </div>
+          </div>
+          <div class="ml-auto">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+              </svg>
+              AI Powered
+            </span>
+          </div>
+        </div>
+        
+        <!-- AI Query Input -->
+        <div class="mb-6">
+          <form method="GET" action="{% url 'meals_list' %}" class="w-full">
+            {% if query %}
+            <input type="hidden" name="q" value="{{ query }}">
+            {% endif %}
+            <div class="relative group">
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                  <svg class="h-5 w-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  name="ai_query"
+                  value="{{ ai_query }}"
+                  placeholder="Ask AI: 'What should I eat for muscle gain?' or 'Suggest low carb meals'"
+                  class="w-full pl-12 pr-32 py-3 border border-purple-500/30 rounded-xl shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-800/80 backdrop-blur-sm hover:bg-gray-800 transition-all duration-300 text-white placeholder-purple-300"
+                />
+                <div class="absolute right-2 top-2 bottom-2 flex items-center space-x-2">
+                  {% if ai_query %}
+                  <a href="{% url 'meals_list' %}{% if query %}?q={{ query }}{% endif %}" 
+                     class="px-3 py-1 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-300">
+                    Clear
+                  </a>
+                  {% endif %}
+                  <button
+                    type="submit"
+                    class="px-4 py-1 text-white hover:text-purple-200 hover:bg-purple-600 rounded-lg transition-all duration-300 flex items-center justify-center font-medium text-sm"
+                  >
+                    Ask AI
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Quick AI Prompts -->
+        <div class="mb-6">
+          <div class="flex flex-wrap gap-2">
+            <span class="text-xs text-purple-300 mr-2">Quick prompts:</span>
+            <button onclick="document.querySelector('input[name=ai_query]').value='What should I eat for weight loss?'; document.querySelector('form').submit();" 
+                    class="px-3 py-1 bg-purple-600/30 hover:bg-purple-600 text-purple-200 hover:text-white rounded-lg text-xs transition-all duration-200">
+              Weight Loss
+            </button>
+            <button onclick="document.querySelector('input[name=ai_query]').value='Suggest high protein meals for muscle building'; document.querySelector('form').submit();" 
+                    class="px-3 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-200 hover:text-white rounded-lg text-xs transition-all duration-200">
+              Muscle Building
+            </button>
+            <button onclick="document.querySelector('input[name=ai_query]').value='What are healthy breakfast options?'; document.querySelector('form').submit();" 
+                    class="px-3 py-1 bg-orange-600/30 hover:bg-orange-600 text-orange-200 hover:text-white rounded-lg text-xs transition-all duration-200">
+              Healthy Breakfast
+            </button>
+            <button onclick="document.querySelector('input[name=ai_query]').value='Low carb dinner ideas'; document.querySelector('form').submit();" 
+                    class="px-3 py-1 bg-green-600/30 hover:bg-green-600 text-green-200 hover:text-white rounded-lg text-xs transition-all duration-200">
+              Low Carb
+            </button>
+          </div>
+        </div>
+
+        <!-- AI Response Message -->
+        {% if ai_response_message %}
+        <div class="mb-4 p-3 bg-purple-900/20 border border-purple-500/20 rounded-lg">
+          <p class="text-sm text-purple-200">
+            <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            {{ ai_response_message }}
+          </p>
+        </div>
+        {% endif %}
+        
+        <!-- AI Recommendations Display -->
+        {% if recommended_meals %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {% for meal in recommended_meals %}
+          <div class="group relative bg-gray-800/50 rounded-xl border border-gray-600/30 hover:border-purple-500/50 transition-all duration-300 overflow-hidden">
+            <!-- Recommendation Badge -->
+            <div class="absolute top-2 left-2 z-10">
+              <div class="flex items-center space-x-1 bg-gradient-to-r from-purple-500 to-blue-500 px-2 py-1 rounded-lg text-xs font-bold text-white">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                </svg>
+                <span>{{ meal.relevance_score|floatformat:0 }}%</span>
+              </div>
+            </div>
+            
+            <div class="relative h-32 overflow-hidden">
+              {% if meal.image %}
+              <img src="{{ meal.image.url }}" alt="{{ meal.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+              {% else %}
+              <div class="h-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
+                <div class="text-center">
+                  <div class="text-2xl mb-1 opacity-80">🍽️</div>
+                  <span class="text-white/80 font-medium text-xs"></span>
+                </div>
+              </div>
+              {% endif %}
+              
+              <!-- Meal Type Badge -->
+            
+            </div>
+            
+            <div class="p-4">
+              <h4 class="text-sm font-bold text-white mb-2 line-clamp-1">{{ meal.title }}</h4>
+              
+              <!-- AI Recommendation Reason -->
+              {% if meal.recommendation_reason %}
+              <div class="mb-3 p-2 bg-purple-900/20 border border-purple-500/20 rounded-lg">
+                <p class="text-xs text-purple-200 italic">
+                  "{{ meal.recommendation_reason }}"
+                </p>
+              </div>
+              {% endif %}
+              
+              <!-- Enhanced Rating for AI Recommended Meals -->
+              <div class="mb-3 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  {% if meal.reviews.all %}
+                  {% with rating=meal.average_rating %}
+                  <div class="flex space-x-0.5">
+                    {% for i in "12345"|make_list %}
+                      {% if forloop.counter <= rating %}
+                      <!-- Filled Star with glow effect -->
+                      <svg class="w-3.5 h-3.5 text-yellow-400 drop-shadow-md" fill="currentColor" viewBox="0 0 20 20" style="filter: drop-shadow(0 0 2px rgba(251, 191, 36, 0.5));">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                      {% else %}
+                      <!-- Light empty Star -->
+                      <svg class="w-3.5 h-3.5 text-gray-500" fill="currentColor" viewBox="0 0 20 20" style="opacity: 0.2;">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <div class="flex items-center space-x-1">
+                    <span class="text-xs font-bold text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded-full">{{ meal.average_rating }}.0</span>
+                    <span class="text-xs text-gray-400">({{ meal.reviews.count }})</span>
+                  </div>
+                  {% endwith %}
+                  {% else %}
+                  <div class="flex items-center space-x-2">
+                    <div class="flex space-x-0.5">
+                      {% for i in "12345"|make_list %}
+                      <svg class="w-3.5 h-3.5 text-gray-600" fill="currentColor" viewBox="0 0 20 20" style="opacity: 0.15;">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                      {% endfor %}
+                    </div>
+                    <span class="text-xs text-gray-500 italic bg-gray-500/10 px-2 py-0.5 rounded-full">New Recipe</span>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              
+              <a href="{% url 'meal_detail' meal.id %}" class="w-full inline-flex items-center justify-center px-3 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg text-xs transition-all duration-300 transform hover:scale-105">
+                View Recipe
+                <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% elif ai_recommendations_available and not recommended_meals %}
+        <div class="text-center py-8">
+          <div class="text-4xl mb-3 opacity-60">🤔</div>
+          <p class="text-gray-300 mb-2">No AI recommendations available</p>
+          <p class="text-sm text-gray-400">Try asking the AI assistant above for meal suggestions!</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <!-- Login prompt for AI features -->
+    <div class="mb-8">
+      <div class="bg-gradient-to-r from-purple-900/30 to-blue-900/30 backdrop-blur-sm rounded-2xl border border-purple-500/30 p-6 text-center">
+        <div class="mb-4">
+          <div class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mb-3">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">🤖 AI Meal Assistant</h3>
+          <p class="text-gray-300 mb-4">Login to access AI-powered meal recommendations and personalized nutrition advice!</p>
+          <a href="{% url 'login' %}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+            </svg>
+            Login to Get Started
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Premium Meal Plans Alert -->
+    {% if user.is_authenticated and not has_premium_subscription %}
+    <div class="mb-8">
+      <div class="bg-gradient-to-r from-red-900/40 to-pink-900/40 backdrop-blur-sm rounded-2xl border border-red-500/50 p-6 shadow-xl">
+        <div class="flex items-start space-x-4">
+          <!-- Alert Icon -->
+          <div class="flex-shrink-0">
+            <div class="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-full">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+            </div>
+          </div>
+          
+          <!-- Alert Content -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-lg font-bold text-white flex items-center">
+                🔒 Premium Meal Plans Locked
+                {% if subscription_expired %}
+                <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-500/20 text-orange-300">
+                  Subscription Expired
+                </span>
+                {% endif %}
+              </h3>
+            </div>
+            
+            <p class="text-red-200 mb-4 leading-relaxed">
+              {% if subscription_expired %}
+              Your subscription has expired! Upgrade to Premium to continue accessing exclusive meal plans with detailed nutrition information, meal prep guides, and personalized dietary recommendations.
+              {% else %}
+              Unlock premium meal plans with detailed nutrition information, meal prep guides, shopping lists, and AI-powered dietary recommendations tailored to your health goals.
+              {% endif %}
+            </p>
+            
+            <!-- Features List -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+              <div class="flex items-center text-sm text-red-100">
+                <svg class="w-4 h-4 mr-2 text-red-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Detailed nutrition information
+              </div>
+              <div class="flex items-center text-sm text-red-100">
+                <svg class="w-4 h-4 mr-2 text-red-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Meal prep guides & tips
+              </div>
+              <div class="flex items-center text-sm text-red-100">
+                <svg class="w-4 h-4 mr-2 text-red-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Shopping lists & ingredients
+              </div>
+              <div class="flex items-center text-sm text-red-100">
+                <svg class="w-4 h-4 mr-2 text-red-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Personalized dietary plans
+              </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-3">
+              <a href="{% url 'pricing' %}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                </svg>
+                {% if subscription_expired %}Renew Premium{% else %}Upgrade to Premium{% endif %}
+              </a>
+              
+              <a href="{% url 'pricing' %}" class="inline-flex items-center px-4 py-3 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white font-medium rounded-xl transition-all duration-300 border border-gray-600 hover:border-gray-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                View Plans
+              </a>
+            </div>
+          </div>
+          
+          <!-- Close Button (Optional) -->
+          <div class="flex-shrink-0">
+            <button onclick="this.closest('.bg-gradient-to-r').style.display='none'" class="text-red-300 hover:text-white transition-colors duration-200">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Enhanced Dark Theme Meal Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {% for meal in meals %}
+      <div class="group relative bg-gray-800 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-700/50 hover:border-gray-600">
+        <div class="relative overflow-hidden rounded-t-2xl">
+          {% if meal.image %}
+          <div class="relative h-48 overflow-hidden">
+            <img
+              src="{{ meal.image.url }}"
+              alt="{{ meal.title }}"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <!-- Dark Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent"></div>
+          </div>
+          {% else %}
+          <div class="h-48 bg-gradient-to-br from-gray-700 via-gray-600 to-gray-700 flex items-center justify-center">
+            <div class="text-center">
+              <div class="text-4xl mb-2 opacity-60">🍽️</div>
+              <span class="text-gray-400 font-medium text-sm">No Image Available</span>
+            </div>
+          </div>
+          {% endif %}
+          
+          <!-- Meal Type Badge -->
+        
+          
+          <!-- Premium/Free Badge -->
+          <div class="absolute top-3 left-3">
+            {% if meal.is_paid %}
+            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg">
+              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+              PREMIUM
+            </span>
+            {% else %}
+            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg">
+              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              FREE
+            </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="relative p-6 space-y-4">
+          <!-- Title -->
+          <h3 class="text-lg font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2 leading-tight">
+            {{ meal.title }}
+          </h3>
+          
+          <!-- Description -->
+          <p class="text-gray-400 text-sm leading-relaxed line-clamp-2">
+            {{ meal.description }}
+          </p>
+
+          <!-- Enhanced Rating Section -->
+          <div class="flex items-center justify-between pt-3 border-t border-gray-700">
+            <div class="flex items-center space-x-2">
+              {% if meal.reviews.all %}
+              <div class="flex items-center space-x-2">
+                {% with rating=meal.average_rating %}
+                <div class="flex space-x-0.5">
+                  {% for i in "12345"|make_list %}
+                    {% if forloop.counter <= rating %}
+                    <!-- Filled Star with enhanced glow -->
+                    <svg class="w-4 h-4 text-yellow-400 drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20" style="filter: drop-shadow(0 0 3px rgba(251, 191, 36, 0.6));">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                    {% else %}
+                    <!-- Light empty star with subtle opacity -->
+                    <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20" style="opacity: 0.25;">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                {% endwith %}
+                <div class="flex items-center space-x-1">
+                  <span class="text-sm font-bold text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded-full border border-yellow-400/20">{{ meal.average_rating }}.0</span>
+                  <span class="text-xs text-gray-500">•</span>
+                  <span class="text-xs text-gray-500">({{ meal.reviews.count }})</span>
+                </div>
+              </div>
+              {% else %}
+              <!-- No reviews yet - enhanced styling -->
+              <div class="flex items-center space-x-2">
+                <div class="flex space-x-0.5">
+                  {% for i in "12345"|make_list %}
+                  <!-- Very light empty stars for new items -->
+                  <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20" style="opacity: 0.15;">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                  {% endfor %}
+                </div>
+                <span class="text-xs text-gray-500 italic bg-gray-500/10 px-2 py-0.5 rounded-full border border-gray-500/20">New Recipe</span>
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- Additional Info -->
+            <div class="flex items-center space-x-2">
+              <!-- Quick Info Pills -->
+            </div>
+          </div>
+          
+          <!-- Action Button -->
+          <div class="pt-3">
+            <a href="{% url 'meal_detail' meal.id %}" class="w-full inline-flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <span>View Recipe</span>
+              <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <!-- Dark Theme Empty State -->
+      <div class="col-span-full text-center py-16">
+        <div class="max-w-md mx-auto">
+          <div class="mb-6">
+            <div class="text-6xl mb-4 opacity-40">🍽️</div>
+          </div>
+          
+          <h3 class="text-xl font-bold text-white mb-3">
+            {% if query %}
+              No recipes found for "{{ query }}"
+            {% else %}
+              No meal plans available yet
+            {% endif %}
+          </h3>
+          
+          <p class="text-gray-400 mb-6 leading-relaxed">
+            {% if query %}
+              Try adjusting your search terms or browse our categories above
+            {% else %}
+              Check back soon for amazing new recipes and meal plans
+            {% endif %}
+          </p>
+          
+          {% if query %}
+          <div class="space-y-4">
+            <a href="{% url 'meals_list' %}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+              Browse All Recipes
+            </a>
+            
+            <div class="text-sm text-gray-500">
+              or try searching for:
+              <div class="flex flex-wrap gap-2 justify-center mt-2">
+                <button onclick="document.querySelector('input[name=q]').value='chicken'; document.querySelector('form').submit();" class="px-3 py-1 bg-gray-700 text-gray-300 rounded-lg text-xs hover:bg-gray-600 transition-all">
+                  chicken
+                </button>
+                <button onclick="document.querySelector('input[name=q]').value='vegetarian'; document.querySelector('form').submit();" class="px-3 py-1 bg-gray-700 text-gray-300 rounded-lg text-xs hover:bg-gray-600 transition-all">
+                  vegetarian
+                </button>
+                <button onclick="document.querySelector('input[name=q]').value='healthy'; document.querySelector('form').submit();" class="px-3 py-1 bg-gray-700 text-gray-300 rounded-lg text-xs hover:bg-gray-600 transition-all">
+                  healthy
+                </button>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Dark Theme Pagination -->
+    {% if meals.has_other_pages %}
+    <div class="flex justify-center mt-12">
+      <nav class="inline-flex items-center bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/50 p-1">
+        {% if meals.has_previous %}
+        <a
+          href="?page={{ meals.previous_page_number }}{% if query %}&q={{ query }}{% endif %}"
+          class="px-4 py-2 mx-1 bg-gray-700 hover:bg-blue-600 text-gray-300 hover:text-white font-medium rounded-lg transition-all duration-300 flex items-center space-x-1"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          <span>Previous</span>
+        </a>
+        {% endif %}
+        
+        {% for i in meals.paginator.page_range %}
+        <div class="mx-1">
+          {% if meals.number == i %}
+          <span
+            class="px-3 py-2 bg-blue-600 text-white font-semibold rounded-lg"
+          >
+            {{ i }}
+          </span>
+          {% else %}
+          <a
+            href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}"
+            class="px-3 py-2 bg-gray-700 hover:bg-blue-600 text-gray-300 hover:text-white font-medium rounded-lg transition-all duration-300"
+          >
+            {{ i }}
+          </a>
+          {% endif %}
+        </div>
+        {% endfor %}
+        
+        {% if meals.has_next %}
+        <a
+          href="?page={{ meals.next_page_number }}{% if query %}&q={{ query }}{% endif %}"
+          class="px-4 py-2 mx-1 bg-gray-700 hover:bg-blue-600 text-gray-300 hover:text-white font-medium rounded-lg transition-all duration-300 flex items-center space-x-1"
+        >
+          <span>Next</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Custom CSS for enhanced star ratings -->
+<style>
+  .star-glow {
+    filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.7));
+  }
+  
+  .rating-container:hover .star {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+  }
+  
+  .meal-card:hover .star-glow {
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.9));
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Dark Hero Section -->
+<div class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-r from-blue-900/20 to-purple-900/20"></div>
+  <div class="absolute top-0 left-0 w-full h-full">
+    <div class="absolute top-10 left-10 w-20 h-20 bg-blue-500/10 rounded-full blur-xl"></div>
+    <div class="absolute top-32 right-20 w-32 h-32 bg-purple-500/10 rounded-full blur-xl"></div>
+    <div class="absolute bottom-20 left-1/3 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl"></div>
+  </div>
+  
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl md:text-5xl font-black text-white mb-4 font-heading">
+        Discover
+        <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Workout Plans</span>
+      </h1>
+      <p class="text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+        Transform your fitness journey with professional workout plans
+      </p>
+    </div>
+    
+    <!-- Enhanced Dark Search Section -->
+    <div class="max-w-2xl mx-auto mb-6">
+      <form method="get" action="" class="w-full">
+        <div class="relative group">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <input
+              type="text"
+              name="q"
+              value="{{ query }}"
+              placeholder="Search workout plans, exercises, trainers..."
+              class="w-full pl-12 pr-12 py-4 border border-gray-700 rounded-2xl shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800/80 backdrop-blur-sm hover:bg-gray-800 transition-all duration-300 text-white placeholder-gray-400"
+            />
+            <button
+              type="submit"
+              class="absolute right-2 top-2 bottom-2 px-4 text-gray-400 hover:text-white hover:bg-blue-600 rounded-xl transition-all duration-300 flex items-center justify-center"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Dark Background Container -->
+<div class="bg-gray-900 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Premium Subscription Alert -->
+    {% if user.is_authenticated and not has_valid_subscription %}
+    <div class="mb-8">
+      <div class="bg-gradient-to-r from-red-900/40 to-pink-900/40 backdrop-blur-sm rounded-2xl border border-red-500/50 p-6 shadow-xl">
+        <div class="flex items-start space-x-4">
+          <!-- Alert Icon -->
+          <div class="flex-shrink-0">
+            <div class="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-full">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+            </div>
+          </div>
+          
+          <!-- Alert Content -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-lg font-bold text-white flex items-center">
+                🔒 Premium Workouts Locked
+                {% if subscription_expired %}
+                <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-500/20 text-orange-300">
+                  Subscription Expired
+                </span>
+                {% endif %}
+              </h3>
+            </div>
+            
+            <p class="text-red-200 mb-4 leading-relaxed">
+              {% if subscription_expired %}
+              Your subscription has expired! Upgrade now to continue accessing premium workout plans with detailed instructions, progress tracking, and personalized recommendations.
+              {% else %}
+              Unlock premium workout plans with detailed step-by-step instructions, progress tracking, and AI-powered recommendations tailored to your fitness goals.
+              {% endif %}
+            </p>
+            
+            <!-- Features List -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+              <div class="flex items-center text-sm text-red-100">
+                <svg class="w-4 h-4 mr-2 text-red-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Detailed workout instructions
+              </div>
+              <div class="flex items-center text-sm text-red-100">
+                <svg class="w-4 h-4 mr-2 text-red-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Progress tracking & analytics
+              </div>
+              <div class="flex items-center text-sm text-red-100">
+                <svg class="w-4 h-4 mr-2 text-red-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Personalized recommendations
+              </div>
+              <div class="flex items-center text-sm text-red-100">
+                <svg class="w-4 h-4 mr-2 text-red-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Access to premium content
+              </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-3">
+              <a href="{% url 'pricing' %}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                </svg>
+                {% if subscription_expired %}Renew Subscription{% else %}Upgrade Now{% endif %}
+              </a>
+              
+              <a href="{% url 'pricing' %}" class="inline-flex items-center px-4 py-3 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white font-medium rounded-xl transition-all duration-300 border border-gray-600 hover:border-gray-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                View Plans
+              </a>
+            </div>
+          </div>
+          
+          <!-- Close Button (Optional) -->
+          <div class="flex-shrink-0">
+            <button onclick="this.closest('.bg-gradient-to-r').style.display='none'" class="text-red-300 hover:text-white transition-colors duration-200">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    <!-- Compact Filter Section -->
+    <div class="mb-8">
+      <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6">
+        <form method="get" action="" class="w-full">
+          <div class="flex flex-wrap gap-3 items-center justify-center">
+            <span class="text-sm font-medium text-gray-300 mr-2">Filter by:</span>
+            
+            <!-- Age Range Filters -->
+            <div class="flex items-center space-x-2">
+              <select name="min_age" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-xl text-sm font-medium text-gray-300 hover:text-white transition-all duration-300 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Min Age</option>
+                <option value="15" {% if min_age == "15" %}selected{% endif %}>15+</option>
+                <option value="20" {% if min_age == "20" %}selected{% endif %}>20+</option>
+                <option value="25" {% if min_age == "25" %}selected{% endif %}>25+</option>
+                <option value="30" {% if min_age == "30" %}selected{% endif %}>30+</option>
+                <option value="35" {% if min_age == "35" %}selected{% endif %}>35+</option>
+                <option value="40" {% if min_age == "40" %}selected{% endif %}>40+</option>
+              </select>
+              
+              <select name="max_age" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-xl text-sm font-medium text-gray-300 hover:text-white transition-all duration-300 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Max Age</option>
+                <option value="35" {% if max_age == "35" %}selected{% endif %}>35</option>
+                <option value="40" {% if max_age == "40" %}selected{% endif %}>40</option>
+                <option value="45" {% if max_age == "45" %}selected{% endif %}>45</option>
+                <option value="50" {% if max_age == "50" %}selected{% endif %}>50</option>
+                <option value="55" {% if max_age == "55" %}selected{% endif %}>55</option>
+                <option value="60" {% if max_age == "60" %}selected{% endif %}>60</option>
+              </select>
+            </div>
+            
+            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl text-sm font-medium text-white transition-all duration-300">
+              Apply Filters
+            </button>
+            
+            <!-- Quick Search Tags -->
+            <div class="border-l border-gray-600 pl-4 ml-2">
+              <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="document.querySelector('input[name=q]').value='strength'; this.closest('form').submit();" 
+                        class="px-3 py-1 bg-gray-600 hover:bg-orange-600 text-gray-300 hover:text-white rounded-lg text-xs transition-all duration-200">
+                  💪 Strength
+                </button>
+                <button type="button" onclick="document.querySelector('input[name=q]').value='cardio'; this.closest('form').submit();" 
+                        class="px-3 py-1 bg-gray-600 hover:bg-red-600 text-gray-300 hover:text-white rounded-lg text-xs transition-all duration-200">
+                  🏃 Cardio
+                </button>
+                <button type="button" onclick="document.querySelector('input[name=q]').value='yoga'; this.closest('form').submit();" 
+                        class="px-3 py-1 bg-gray-600 hover:bg-green-600 text-gray-300 hover:text-white rounded-lg text-xs transition-all duration-200">
+                  🧘 Yoga
+                </button>
+                <button type="button" onclick="document.querySelector('input[name=q]').value='hiit'; this.closest('form').submit();" 
+                        class="px-3 py-1 bg-gray-600 hover:bg-purple-600 text-gray-300 hover:text-white rounded-lg text-xs transition-all duration-200">
+                  ⚡ HIIT
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Dark Theme Workout Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {% for workout in workouts %}
+      <div class="group relative bg-gray-800 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-700/50 hover:border-gray-600">
+        <div class="relative overflow-hidden rounded-t-2xl">
+          {% if workout.thumbnail %}
+          <div class="relative h-48 overflow-hidden">
+            <img
+              src="{{ workout.thumbnail.url }}"
+              alt="{{ workout.title }} thumbnail"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <!-- Dark Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent"></div>
+          </div>
+          {% else %}
+          <div class="relative h-48 overflow-hidden">
+            <img
+              src="https://www.setforset.com/cdn/shop/articles/cristiano_ronaldo_workout_2000x.jpg?v=1723719018"
+              alt="{{ workout.title }} thumbnail"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <!-- Dark Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent"></div>
+          </div>
+          {% endif %}
+          
+          <!-- Age Range Badge -->
+          <div class="absolute top-3 right-3">
+            <span class="bg-gray-900/80 backdrop-blur-sm px-3 py-1 rounded-xl text-xs font-semibold text-gray-200 border border-gray-600">
+              Ages {{ workout.recommended_age_min }}-{{ workout.recommended_age_max }}
+            </span>
+          </div>
+          
+          <!-- Premium/Free Badge -->
+          <div class="absolute top-3 left-3">
+            {% if not workout.is_paid %}
+            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg">
+              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              FREE
+            </span>
+            {% else %}
+              {% if user.is_authenticated and workout.id in paid_workout_ids %}
+              <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                PAID
+              </span>
+              {% else %}
+              <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                PREMIUM
+              </span>
+              {% endif %}
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="relative p-6 space-y-4">
+          <!-- Title -->
+          <h3 class="text-lg font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2 leading-tight">
+            <a href="{% url 'workout_detail' workout.id %}">
+              {{ workout.title }}
+            </a>
+          </h3>
+          
+          <!-- Description -->
+          <p class="text-gray-400 text-sm leading-relaxed line-clamp-2">
+            {{ workout.description|truncatewords:20 }}
+          </p>
+
+          <!-- Action Button -->
+          <div class="pt-3">
+            <a href="{% url 'workout_detail' workout.id %}" class="w-full inline-flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <span>View Workout</span>
+              <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <!-- Dark Theme Empty State -->
+      <div class="col-span-full text-center py-16">
+        <div class="max-w-md mx-auto">
+          <div class="mb-6">
+            <div class="text-6xl mb-4 opacity-40">💪</div>
+          </div>
+          
+          <h3 class="text-xl font-bold text-white mb-3">
+            No workout plans found
+          </h3>
+          
+          <p class="text-gray-400 mb-6 leading-relaxed">
+            Try adjusting your search terms or age filters above
+          </p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Dark Theme Pagination -->
+    {% if workouts.has_other_pages %}
+    <div class="flex justify-center mt-12">
+      <nav class="inline-flex items-center bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/50 p-1">
+        {% if workouts.has_previous %}
+        <a
+          href="?{% if query %}q={{ query }}&{% endif %}{% if min_age %}min_age={{ min_age }}&{% endif %}{% if max_age %}max_age={{ max_age }}&{% endif %}page={{ workouts.previous_page_number }}"
+          class="px-4 py-2 mx-1 bg-gray-700 hover:bg-blue-600 text-gray-300 hover:text-white font-medium rounded-lg transition-all duration-300 flex items-center space-x-1"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          <span>Previous</span>
+        </a>
+        {% endif %}
+        
+        {% for num in workouts.paginator.page_range %}
+        <div class="mx-1">
+          {% if workouts.number == num %}
+          <span
+            class="px-3 py-2 bg-blue-600 text-white font-semibold rounded-lg"
+          >
+            {{ num }}
+          </span>
+          {% else %}
+          <a
+            href="?{% if query %}q={{ query }}&{% endif %}{% if min_age %}min_age={{ min_age }}&{% endif %}{% if max_age %}max_age={{ max_age }}&{% endif %}page={{ num }}"
+            class="px-3 py-2 bg-gray-700 hover:bg-blue-600 text-gray-300 hover:text-white font-medium rounded-lg transition-all duration-300"
+          >
+            {{ num }}
+          </a>
+          {% endif %}
+        </div>
+        {% endfor %}
+        
+        {% if workouts.has_next %}
+        <a
+          href="?{% if query %}q={{ query }}&{% endif %}{% if min_age %}min_age={{ min_age }}&{% endif %}{% if max_age %}max_age={{ max_age }}&{% endif %}page={{ workouts.next_page_number }}"
+          class="px-4 py-2 mx-1 bg-gray-700 hover:bg-blue-600 text-gray-300 hover:text-white font-medium rounded-lg transition-all duration-300 flex items-center space-x-1"
+        >
+          <span>Next</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

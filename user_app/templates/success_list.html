@@ -1,0 +1,278 @@
+{% extends 'base.html' %} {% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8 bg-gray-900 min-h-screen">
+  <!-- Header Section -->
+  <div class="text-center mb-12">
+    <h1 class="text-5xl font-bold text-white mb-4 bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+      Transformation Stories
+    </h1>
+    <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+      Discover inspiring journeys of individuals who transformed their lives through fitness, dedication, and perseverance. 
+      Every story is a testament to human potential and the power of commitment.
+    </p>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="mb-12">
+    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-2xl">
+      <form method="GET" class="flex flex-col md:flex-row gap-4">
+        <!-- Search Input -->
+        <div class="flex-1">
+          <div class="relative">
+            <input
+              type="text"
+              name="q"
+              value="{{ search_query }}"
+              placeholder="Search success stories..."
+              class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+            <svg class="absolute right-3 top-3 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+        </div>
+        
+        <!-- Category Filter -->
+        <div class="md:w-64">
+          <select
+            name="category"
+            class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          >
+            <option value="">All Categories</option>
+            {% for value, label in categories %}
+              <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <!-- Search Button -->
+        <button
+          type="submit"
+          class="bg-primary hover:bg-primary/80 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center justify-center gap-2"
+        >
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.707A1 1 0 013 7V4z"/>
+          </svg>
+          Filter
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Hero Featured Story -->
+  {% if success_stories %}
+    {% with success_stories.0 as featured_story %}
+      {% if featured_story.is_featured %}
+        <div class="mb-16">
+          <div class="relative rounded-2xl bg-gray-800 overflow-hidden border border-gray-700 shadow-2xl">
+            <div class="flex flex-col lg:flex-row">
+              <div class="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
+                <div class="mb-4">
+                  <span class="inline-block bg-primary/20 text-primary px-3 py-1 rounded-full text-sm font-semibold mb-4">
+                    🌟 Featured Story
+                  </span>
+                  <span class="inline-block bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm ml-2">
+                    {{ featured_story.get_category_display }}
+                  </span>
+                </div>
+                <h2 class="text-4xl lg:text-5xl font-bold text-white mb-4">
+                  {{ featured_story.title }}
+                </h2>
+                <p class="text-gray-400 text-lg mb-6 leading-relaxed">
+                  {{ featured_story.description|truncatewords:25 }}
+                </p>
+                <div class="flex flex-wrap gap-4 mb-6">
+                  {% if featured_story.duration %}
+                    <div class="flex items-center text-gray-300">
+                      <svg class="h-5 w-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      {{ featured_story.duration }}
+                    </div>
+                  {% endif %}
+                  {% if featured_story.get_weight_loss_display %}
+                    <div class="flex items-center text-gray-300">
+                      <svg class="h-5 w-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                      </svg>
+                      {{ featured_story.get_weight_loss_display }}
+                    </div>
+                  {% endif %}
+                </div>
+                <a
+                  href="{% url 'success_detail' featured_story.pk %}"
+                  class="inline-flex items-center bg-primary hover:bg-primary/80 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 w-fit"
+                >
+                  Read Full Story
+                  <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                  </svg>
+                </a>
+              </div>
+              <div class="lg:w-1/2 relative">
+                {% if featured_story.image %}
+                  <img
+                    src="{{ featured_story.image.url }}"
+                    alt="{{ featured_story.title }}"
+                    class="w-full h-80 lg:h-full object-cover"
+                  />
+                {% else %}
+                  <img
+                    src="https://d.newsweek.com/en/full/2100561/lalo-rumayor-before-after-body-transformation.jpg?w=1200&f=65b17ba17603f9f0980bc8162a2f2ded"
+                    alt="{{ featured_story.title }}"
+                    class="w-full h-80 lg:h-full object-cover"
+                  />
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endwith %}
+  {% endif %}
+
+  <!-- Success Stories Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+    {% for story in success_stories %}
+      {% if not story.is_featured or not forloop.first %}
+        <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:border-primary/50 group">
+          <div class="relative">
+            {% if story.image %}
+              <img
+                src="{{ story.image.url }}"
+                alt="{{ story.title }}"
+                class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            {% else %}
+              <img
+                src="{% cycle 'https://a57.foxnews.com/static.foxbusiness.com/foxbusiness.com/content/uploads/2020/08/931/523/Mari-Llewellyn_Before-and-After-2-002-1.png?ve=1&tl=1' 'https://www.kathrynalexander.com/wp-content/uploads/2024/05/about-but-I-will-crop-scaled.jpg' 'https://i0.wp.com/thecutgym.com/wp-content/uploads/2024/05/body-transformation-female.webp?fit=1000%2C700&ssl=1' 'https://cdn.shopify.com/s/files/1/1283/2557/files/Body_Transformation_In_3_Months_by_Swolverine_1024x1024.png?v=1669226829' %}"
+                alt="{{ story.title }}"
+                class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            {% endif %}
+            <div class="absolute top-4 left-4">
+              <span class="bg-gray-900/80 text-primary px-3 py-1 rounded-full text-sm font-semibold backdrop-blur-sm">
+                {{ story.get_category_display }}
+              </span>
+            </div>
+            {% if story.is_verified %}
+              <div class="absolute top-4 right-4">
+                <span class="bg-green-500/80 text-white px-2 py-1 rounded-full text-xs font-semibold backdrop-blur-sm flex items-center">
+                  <svg class="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                  Verified
+                </span>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors duration-200">
+              {{ story.title }}
+            </h3>
+            <p class="text-gray-400 mb-4 leading-relaxed">
+              {{ story.description|truncatewords:20 }}
+            </p>
+
+            <!-- Story Stats -->
+            <div class="flex flex-wrap gap-3 mb-4">
+              {% if story.duration %}
+                <div class="flex items-center text-sm text-gray-300 bg-gray-700/50 px-3 py-1 rounded-full">
+                  <svg class="h-4 w-4 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  {{ story.duration }}
+                </div>
+              {% endif %}
+              {% if story.get_weight_loss_display %}
+                <div class="flex items-center text-sm text-gray-300 bg-gray-700/50 px-3 py-1 rounded-full">
+                  <svg class="h-4 w-4 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                  {{ story.get_weight_loss_display }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="flex items-center justify-between">
+              {% if story.user %}
+                <div class="flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mr-2">
+                    <svg class="h-4 w-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-400">{{ story.user.first_name|default:"Anonymous" }}</span>
+                </div>
+              {% endif %}
+              
+              <a
+                href="{% url 'success_detail' story.pk %}"
+                class="text-primary hover:text-primary/80 font-semibold text-sm transition-colors duration-200 flex items-center"
+              >
+                Read More
+                <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% empty %}
+      <div class="col-span-full">
+        <div class="bg-gray-800 border border-gray-700 rounded-xl p-12 text-center">
+          <svg class="h-16 w-16 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+          </svg>
+          <h3 class="text-xl font-semibold text-gray-400 mb-2">No Success Stories Found</h3>
+          <p class="text-gray-500">Try adjusting your search criteria or check back later for new inspiring stories.</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Call to Action -->
+  <div class="bg-gradient-to-r from-primary/20 to-blue-500/20 border border-primary/30 rounded-xl p-8 text-center">
+    <h3 class="text-2xl font-bold text-white mb-4">Ready to Start Your Own Transformation?</h3>
+    <p class="text-gray-300 mb-6 max-w-2xl mx-auto">
+      Join thousands of others who have transformed their lives through fitness. Your success story could be featured here next!
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="{% url 'workouts_list' %}" class="bg-primary hover:bg-primary/80 text-white px-6 py-3 rounded-lg font-semibold transition duration-200">
+        Browse Workouts
+      </a>
+      <a href="{% url 'meals_list' %}" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 border border-gray-600">
+        View Meal Plans
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Scroll to top button -->
+<button
+  id="scrollToTop"
+  class="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-primary shadow-lg flex items-center justify-center border border-primary/30 opacity-0 transition-all duration-300 hover:bg-primary/80"
+>
+  <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+  </svg>
+</button>
+
+<script>
+// Scroll to top functionality
+const scrollToTopBtn = document.getElementById('scrollToTop');
+window.addEventListener('scroll', () => {
+  if (window.pageYOffset > 300) {
+    scrollToTopBtn.style.opacity = '1';
+  } else {
+    scrollToTopBtn.style.opacity = '0';
+  }
+});
+
+scrollToTopBtn.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+{% endblock %}

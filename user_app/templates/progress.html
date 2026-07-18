@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-10">
+  <h1 class="text-3xl font-bold text-white mb-2">📈 My Progress</h1>
+  <p class="text-gray-400 mb-8">Your training, tracked. Keep showing up.</p>
+
+  <!-- headline stats -->
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+    <div class="bg-gray-800/60 rounded-2xl p-5 text-center">
+      <div class="text-3xl font-bold text-emerald-400">{{ total_workouts }}</div>
+      <div class="text-gray-400 text-sm mt-1">Total workouts</div>
+    </div>
+    <div class="bg-gray-800/60 rounded-2xl p-5 text-center">
+      <div class="text-3xl font-bold text-emerald-400">{{ this_week }}</div>
+      <div class="text-gray-400 text-sm mt-1">This week</div>
+    </div>
+    <div class="bg-gray-800/60 rounded-2xl p-5 text-center">
+      <div class="text-3xl font-bold text-orange-400">🔥 {{ streak }}</div>
+      <div class="text-gray-400 text-sm mt-1">Day streak</div>
+    </div>
+    <div class="bg-gray-800/60 rounded-2xl p-5 text-center">
+      <div class="text-3xl font-bold text-emerald-400">{{ total_minutes }}</div>
+      <div class="text-gray-400 text-sm mt-1">Minutes trained</div>
+    </div>
+    <div class="bg-gray-800/60 rounded-2xl p-5 text-center">
+      <div class="text-3xl font-bold text-emerald-400">{{ avg_difficulty }}</div>
+      <div class="text-gray-400 text-sm mt-1">Avg difficulty /5</div>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-gray-800/60 rounded-2xl p-6">
+      <h2 class="text-white font-semibold mb-4">Workouts per week (last 8)</h2>
+      <canvas id="weeksChart" height="180"></canvas>
+    </div>
+    <div class="bg-gray-800/60 rounded-2xl p-6">
+      <h2 class="text-white font-semibold mb-4">Last 30 days activity</h2>
+      <canvas id="daysChart" height="180"></canvas>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-gray-800/60 rounded-2xl p-6">
+      <h2 class="text-white font-semibold mb-4">🏆 Favourite plans</h2>
+      {% if top_plans %}
+        {% for p in top_plans %}
+        <div class="flex justify-between py-2 border-b border-gray-700/50 text-gray-300">
+          <span>{{ p.workout_plan__title }}</span>
+          <span class="text-emerald-400 font-semibold">{{ p.count }}×</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-gray-500">Complete a workout to see stats here.</p>
+      {% endif %}
+    </div>
+    <div class="bg-gray-800/60 rounded-2xl p-6">
+      <h2 class="text-white font-semibold mb-4">💪 Exercise records</h2>
+      {% if top_exercises %}
+        {% for e in top_exercises %}
+        <div class="flex justify-between py-2 border-b border-gray-700/50 text-gray-300">
+          <span>{{ e.exercise.title }}</span>
+          <span class="text-sm text-gray-400">
+            {{ e.times_completed }}× done
+            {% if e.personal_best_weight %} · PB {{ e.personal_best_weight }}kg{% endif %}
+            {% if e.personal_best_reps %} · {{ e.personal_best_reps }} reps{% endif %}
+          </span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-gray-500">No exercise records yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="bg-gray-800/60 rounded-2xl p-6">
+    <h2 class="text-white font-semibold mb-4">Recent sessions</h2>
+    {% if recent %}
+      {% for h in recent %}
+      <div class="flex flex-wrap justify-between py-2 border-b border-gray-700/50 text-gray-300">
+        <span>{{ h.workout_plan.title }}</span>
+        <span class="text-sm text-gray-400">
+          {{ h.completed_at|date:"M d, H:i" }}
+          {% if h.duration_minutes %} · {{ h.duration_minutes }} min{% endif %}
+          {% if h.difficulty_rating %} · difficulty {{ h.difficulty_rating }}/5{% endif %}
+        </span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-gray-500">No workouts completed yet — open a workout and hit
+        <span class="text-emerald-400">Complete</span> to start your history!</p>
+    {% endif %}
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+const gridColor = "rgba(148,163,184,.12)", tickColor = "#94a3b8";
+new Chart(document.getElementById("weeksChart"), {
+  type: "bar",
+  data: { labels: {{ weeks_labels|safe }},
+    datasets: [{ data: {{ weeks_data|safe }}, backgroundColor: "#10b981", borderRadius: 6 }] },
+  options: { plugins:{legend:{display:false}},
+    scales:{ x:{grid:{color:gridColor},ticks:{color:tickColor}},
+             y:{grid:{color:gridColor},ticks:{color:tickColor,stepSize:1},beginAtZero:true} } }
+});
+new Chart(document.getElementById("daysChart"), {
+  type: "bar",
+  data: { labels: {{ days_labels|safe }},
+    datasets: [{ data: {{ days_data|safe }},
+      backgroundColor: {{ days_data|safe }}.map(v => v ? "#10b981" : "rgba(148,163,184,.15)"),
+      borderRadius: 3 }] },
+  options: { plugins:{legend:{display:false},tooltip:{enabled:false}},
+    scales:{ x:{grid:{display:false},ticks:{color:tickColor,maxTicksLimit:10}},
+             y:{display:false,max:1} } }
+});
+</script>
+{% endblock %}

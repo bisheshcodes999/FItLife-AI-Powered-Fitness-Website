@@ -1,0 +1,77 @@
+{% extends 'base.html' %} {% block title %}Verify Your Email{% endblock %}
+
+<div>
+  {% block content %}
+  <div class="min-h-screen flex items-center justify-center py-8 bg-gray-900">
+    <div
+      class="max-w-md w-full p-8 rounded-2xl shadow-lg border border-gray-600 bg-gray-700"
+    >
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gradient mb-2">
+          Verify Your Email, {{ request.user }}
+        </h2>
+        <p class="mt-2 text-gray-400">Enter the code sent to your email.</p>
+      </div>
+
+      <form method="POST" id="verification-form">
+        {% csrf_token %}
+        <div class="flex justify-center gap-3 mb-8" id="otp-container">
+          {% for digit in "123456"|make_list %}
+          <input
+            type="text"
+            maxlength="1"
+            class="otp-input w-12 h-12 text-center text-2xl rounded-lg bg-gray-700 border border-gray-600 text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors"
+            required
+          />
+          {% endfor %}
+        </div>
+
+        <!-- Hidden input to store concatenated OTP -->
+        <input
+          type="hidden"
+          id="verification_code_hidden"
+          name="verification_code"
+        />
+
+        <button
+          type="submit"
+          class="w-full px-4 py-3 rounded-lg btn-primary text-white font-semibold hover:opacity-90 transition-all duration-300 transform hover:scale-105"
+        >
+          Verify OTP
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Get all OTP input fields
+    const otpInputs = document.querySelectorAll(".otp-input");
+    otpInputs.forEach((input, index) => {
+      input.addEventListener("input", (e) => {
+        const value = e.target.value;
+        if (isNaN(Number(value))) {
+          e.target.value = "";
+          return;
+        }
+        if (value !== "") {
+          const nextInput = otpInputs[index + 1];
+          if (nextInput) nextInput.focus();
+        }
+      });
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && e.target.value === "") {
+          const prevInput = otpInputs[index - 1];
+          if (prevInput) prevInput.focus();
+        }
+      });
+    });
+    const form = document.getElementById("verification-form");
+    form.addEventListener("submit", function (e) {
+      const code = Array.from(otpInputs)
+        .map((input) => input.value)
+        .join("");
+      document.getElementById("verification_code_hidden").value = code;
+    });
+  </script>
+  {% endblock %}
+</div>
