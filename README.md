@@ -37,8 +37,8 @@ Chart.js · eSewa payments · Jazzmin admin
 
 ```bash
 # 1. clone & install
-git clone <your-repo-url>
-cd fitlife
+git clone https://github.com/bisheshcodes999/FItLife---AI-Powered-Fitness-Website.git
+cd FItLife---AI-Powered-Fitness-Website
 python -m venv venv
 venv\Scripts\activate        # Linux/Mac: source venv/bin/activate
 pip install -r requirements.txt
@@ -82,7 +82,15 @@ data/megaGymDataset.csv    2,900-exercise dataset
 ```
 
 ## Screenshots
-<!-- Add screenshots here: home page, AI coach, progress dashboard, my plans -->
+
+### 💬 AI Coach — local-LLM personal trainer
+![AI Coach](screenshots/ai-coach.png)
+
+### 🤖 AI Exercise DB — hybrid recommendations with match scores
+![AI Exercises](screenshots/ai-exercises.png)
+
+### 📋 My Plans — AI-generated personal workout plans
+![My Workout Plans](screenshots/my-plans.png)
 
 ## License
 MIT — see [LICENSE](LICENSE).
