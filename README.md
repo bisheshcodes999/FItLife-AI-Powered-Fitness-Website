@@ -43,11 +43,8 @@ python -m venv venv
 venv\Scripts\activate        # Linux/Mac: source venv/bin/activate
 pip install -r requirements.txt
 
-# 2. configure secrets
-copy .env.example .env       # Linux/Mac: cp .env.example .env
-# edit .env with your values
 
-# 3. local AI (one-time, optional but recommended)
+# 2. local AI (one-time, optional but recommended)
 # install Ollama from https://ollama.com, then:
 ollama pull qwen3:8b
 
